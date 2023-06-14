@@ -1,0 +1,23 @@
+{
+  "name": "bash-dash",
+  "version": "1.0.0",
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -k \"npm run dev --prefix ./backend\" \"BROWSER=none npm start --prefix ./frontend\" \"npm:electron\"",
+    "electron": "wait-on tcp:3000 && electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.0",
+    "concurrently": "^8.2.0",
+    "electron": "^25.1.0",
+    "electron-is-dev": "^2.0.0",
+    "react-dom": "^18.2.0",
+    "reactstrap": "^9.2.0",
+    "wait-on": "^7.0.1"
+  }
+}
