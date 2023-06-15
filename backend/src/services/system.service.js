@@ -1,6 +1,14 @@
 const si = require('systeminformation')
 
-
+const getSystemInfo = async () => {
+    const result = {
+        'cpu': await getCPUInfo(),
+        'memory': await getMemoryInfo(),
+        'disks': await getDisksInfo(),
+        'network': await getNetworkInfo()
+    }
+    return result;
+}
 const getDisksInfo = async () => {
     const disks = await si.fsSize();
 
@@ -72,7 +80,7 @@ const _parseCpuLoads = (loads) => {
         'background_load': loads['currentLoadNice'],
         'idle_load': loads['currentLoadIdle'],
     }
-    
+
     if (loads['cpus']) {
         const cores = [];
         for (let core of loads['cpus']) {
@@ -117,5 +125,5 @@ module.exports = {
     getMemoryInfo,
     getCPUInfo,
     getNetworkInfo,
-
+    getSystemInfo,
 }

@@ -5,12 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { systemService } = require('../services');
 
 const getInfo = catchAsync(async (req, res) => {
-    const result = {
-        'cpu': await systemService.getCPUInfo(),
-        'memory': await systemService.getMemoryInfo(),
-        'disks': await systemService.getDisksInfo(),
-        'network': await systemService.getNetworkInfo()
-    }
+    const result = await systemService.getSystemInfo();
     res.json(result);
 });
 
