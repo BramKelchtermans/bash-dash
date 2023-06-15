@@ -3,7 +3,7 @@ const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
 const systemRoute = require('./system.route');
-const config = require('../../config/config');
+const config = require('../config/config');
 
 const router = express.Router();
 
