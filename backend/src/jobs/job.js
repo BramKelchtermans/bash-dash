@@ -21,7 +21,7 @@ class Job {
     everyMinute() {
 
     }
-    fire() {
+    async fire() {
         throw new Error('Please implement a method');
     }
 }
