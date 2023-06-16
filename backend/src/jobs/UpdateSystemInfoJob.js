@@ -1,6 +1,6 @@
 const { systemService } = require("../services");
 const { Job } = require("./job");
-const SystemInformation = require("../database/models").SystemInformation;
+const SystemInformation = require("../models").SystemInformation;
 
 class UpdateSystemInfo extends Job {
     async fire() {
