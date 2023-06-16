@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { systemService } = require('../services');
 const { Op } = require('sequelize');
-const SystemInformation = require('../database/models').SystemInformation;
+const SystemInformation = require('../models').SystemInformation;
 
 const getInfo = catchAsync(async (req, res) => {
     const result = await systemService.getSystemInfo();
