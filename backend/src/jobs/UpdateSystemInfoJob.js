@@ -1,22 +1,36 @@
+import { Op } from "sequelize";
 import SystemInfo from "../models/SystemInfo";
 import SystemService from "../services/SystemService";
 import { Job } from "./job";
+import moment from 'moment';
+
+const addNewInfo = async () => {
+    const raw = await SystemService.getSystemInfo();
+    if (!raw) {
+        return;
+    }
+
+    const entry = SystemInfo.build(raw)
+    await entry.save();
+}
+
+const deleteOldInfo = async () => {
+    const date = moment().subtract(1, 'week').toDate();
+    await SystemInfo.destroy({
+        where: {
+            createdAt: {
+                [Op.lte]: date
+            }
+        }
+    });
+}
 
 
 class UpdateSystemInfo extends Job {
     async fire() {
-        console.log("Starting");
-        const raw = await SystemService.getSystemInfo();
-        if(!raw) {
-            return;
-        }
         try {
-            const data = {};
-            for (let key in raw) {
-                data[key] = JSON.stringify(raw[key]);
-            }
-            const entry = SystemInfo.build(data)
-            await entry.save();
+            await addNewInfo();
+            await deleteOldInfo();
         } catch (e) {
             console.log(e)
         }

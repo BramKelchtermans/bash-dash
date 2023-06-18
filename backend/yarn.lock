@@ -2358,9 +2358,9 @@ moment-timezone@^0.5.35:
   dependencies:
     moment "^2.29.4"
 
-moment@^2.29.1, moment@^2.29.3, moment@^2.29.4:
+moment@^2.29.1, moment@^2.29.4:
   version "2.29.4"
-  resolved "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 ms@2.0.0, ms@^2.0.0:
@@ -2901,6 +2901,11 @@ sequelize-cli@^6.4.1:
     resolve "^1.22.1"
     umzug "^2.3.0"
     yargs "^16.2.0"
+
+sequelize-paginate@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/sequelize-paginate/-/sequelize-paginate-1.1.6.tgz#eb55eae762ed425b3efdc32dbfad378fe7ef6bdb"
+  integrity sha512-PQngK3AFn0WZW09VveD0nf2cfHSKZMbdgfQTDUVRVA8qgidDc9iAwUYb64SVSBlMjXoAhCpewqNdyiSOOF7PvQ==
 
 sequelize-pool@^7.1.0:
   version "7.1.0"
