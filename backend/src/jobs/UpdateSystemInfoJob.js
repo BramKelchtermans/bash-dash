@@ -5,7 +5,11 @@ import { Job } from "./job";
 
 class UpdateSystemInfo extends Job {
     async fire() {
+        console.log("Starting");
         const raw = await SystemService.getSystemInfo();
+        if(!raw) {
+            return;
+        }
         try {
             const data = {};
             for (let key in raw) {
