@@ -1,1 +1,0 @@
-module.exports.systemService = require('./system.service');

@@ -1,33 +1,27 @@
-const app = require('./app');
-const config = require('./config/config');
-const logger = require('./config/logger');
+import dotenv from "dotenv";
+import { ExpressService, SequelizeService, AwsService, SchedulerService } from "./api_services";
+import { logger } from "./config/logger";
+dotenv.config();
 
-let server = app.listen(config.port, () => {
-  logger.info(`Listening to port ${config.port}`);
-});
+const services = [ExpressService, AwsService, SequelizeService, SchedulerService];
 
-const exitHandler = () => {
-  if (server) {
-    server.close(() => {
-      logger.info('Server closed');
-      process.exit(1);
-    });
-  } else {
+(async () => {
+  try {
+    for (const service of services) {
+      await service.init();
+    }
+    console.log("Server initialized.");
+    //PUT ADITIONAL CODE HERE.
+  } catch (error) {
+    console.log(error);
     process.exit(1);
   }
-};
+})();
 
-const unexpectedErrorHandler = (error) => {
+
+const errorHandler = (error) => {
   logger.error(error);
-  exitHandler();
-};
+}
 
-process.on('uncaughtException', unexpectedErrorHandler);
-process.on('unhandledRejection', unexpectedErrorHandler);
 
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received');
-  if (server) {
-    server.close();
-  }
-});
+process.on('uncaughtException', errorHandler)
