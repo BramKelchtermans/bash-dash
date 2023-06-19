@@ -6,15 +6,18 @@
   "author": "gadfaria <gadfaria@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon index.js",
     "migrate": "npx sequelize-cli db:migrate",
-    "migrate:fresh": "npx sequelize-cli db:migrate:undo:all; npx sequelize-cli db:migrate"
+    "migrate:fresh": "npx sequelize-cli db:migrate:undo:all; npx sequelize-cli db:migrate",
+    "build:prod": "rm -rf dist && webpack --config webpack.prod.js --mode production"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.310.0",
+    "@babel/preset-env": "^7.22.5",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
+    "eslint-loader": "^4.0.2",
     "express": "^4.18.1",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
@@ -22,6 +25,7 @@
     "mysql2": "^3.0.0",
     "node-cron": "^3.0.2",
     "pg": "^8.10.0",
+    "pg-hstore": "*",
     "sequelize": "^6.28.2",
     "sequelize-paginate": "^1.1.6",
     "sqlite3": "^5.1.6",
@@ -31,8 +35,25 @@
     "yup": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.5",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^9.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-regenerator-runtime": "^6.5.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "ejs": "^3.1.9",
+    "eslint": ">=5.16.0",
+    "eslint-config-google": "^0.14.0",
     "nodemon": "^2.0.18",
     "sequelize-cli": "^6.4.1",
-    "sucrase": "^3.23.0"
+    "sucrase": "^3.23.0",
+    "webpack": "^5.87.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
   }
 }
