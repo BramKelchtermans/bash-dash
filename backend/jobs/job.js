@@ -4,6 +4,10 @@ class Job {
         cron.schedule(template, this.fire);
     }
 
+    once() {
+        this.fire();
+    }
+
     everyFiveSeconds() {
         this.cron('*/5 * * * * *')
     }
