@@ -31,9 +31,17 @@ class HardwareComponent extends Model {
             },
             {
                 sequelize,
+                modelName: 'HardwareComponent',
+                tableName: 'HardwareComponents',
                 timestamps: true,
             }
         )
+    }
+
+    static associate(models) {
+        this.hasMany(models.HardwareLog, {
+            foreignKey: 'component_id'
+        })
     }
 }
 

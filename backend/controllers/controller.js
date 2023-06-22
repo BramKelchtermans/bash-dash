@@ -1,6 +1,10 @@
 class Controller {
     static successResponseData(res, data) {
-        return res.status(200).json(data);
+        return res.status(200).json({
+            status: 200,
+            msg: 'success',
+            data: data
+        });
     }
     static errorResponseMsg(res, msg) {
         return res.status(500).json({
@@ -21,7 +25,7 @@ class Controller {
         } catch (e) {
 
         }
-        
+
         return {
             page: page,
             paginate: perPage,

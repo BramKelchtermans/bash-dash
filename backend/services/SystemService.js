@@ -1,4 +1,6 @@
 import si from 'systeminformation';
+import HardwareComponent from '../models/HardwareComponent';
+import HardwareLog from '../models/HardwareLog';
 
 const _parseCpuLoads = (loads) => {
     const result = {
@@ -26,26 +28,77 @@ const _parseCpuLoads = (loads) => {
     return result;
 };
 
+const removeProps = (obj, props, inverse = false) => {
+    const result = {};
+    for (let key in obj) {
+        if (inverse && props.includes(key)) {
+            result[key] = obj[key];
+        }
+        if (!inverse && !props.includes(key)) {
+            result[key] = obj[key];
+        }
+    }
+
+    return result;
+}
+
+export const QUERY_MODE = {
+    ALL: 'ALL',
+    STATIC: 'STATIC',
+    VARIABLE: 'VARIABLE'
+}
+
 const SystemService = {
     /**
-     * Get info about the cpu, memory, disks and network of the system
+     * Query a component in the database by type, includes hardware logs
+     * 
+     * @param {string} type 
+     * @returns 
+     */
+    getComponentsByType: async (type) => {
+        const result = await HardwareComponent.findAll({
+            where: {
+                type: type
+            },
+            include: {
+                model: HardwareLog,
+                where: {
+                    
+                }
+            }
+        })
+
+        if (result.length == 1) {
+            return result[0];
+        }
+
+        return result;
+    },
+
+
+
+    /**
+     * Get the live info about the cpu, memory, disks and network of the system
+     * from the SystemInformation API
+     * 
+     * @param {QUERY_MODE} mode 
      * 
      * @returns The information of the current system
      */
-    getSystemInfo: async () => {
+    getLiveSystemInfo: async (mode) => {
         try {
             const result = {
-                'cpu': await SystemService.getCPUInfo(),
-                'memory': await SystemService.getMemoryInfo(),
-                'disks': await SystemService.getDisksInfo(),
-                'network': await SystemService.getNetworkInfo()
+                'cpu': await SystemService.getLiveCPUInfo(mode),
+                'memory': await SystemService.getLiveMemoryInfo(mode),
+                'disks': await SystemService.getLiveDisksInfo(mode),
+                'network': await SystemService.getLiveNetworkInfo(mode)
             }
             return result;
         } catch (e) {
             console.log(e);
         }
     },
-    getDisksInfo: async () => {
+    getLiveDisksInfo: async (mode) => {
         const disks = await si.fsSize();
 
         const result = [];
@@ -59,6 +112,10 @@ const SystemService = {
             obj['use_pct'] = obj['use'];
             delete obj['use'];
 
+            if (mode != QUERY_MODE.ALL) {
+                obj = removeProps(obj, ['used', 'available', 'use_pct'], mode == QUERY_MODE.VARIABLE);
+            }
+
             result.push(obj);
         }
 
@@ -67,16 +124,21 @@ const SystemService = {
 
     /**
      * Get system information about RAM memory
+     * from the SystemInformation API
      * 
      * @returns object
      */
-    getMemoryInfo: async () => {
+    getLiveMemoryInfo: async (mode) => {
         const mem = await si.mem();
 
-        const result = {
+        let result = {
             'total': mem['total'],
             'used': mem['active'],
             'free': mem['free']
+        }
+
+        if(mode != QUERY_MODE.ALL) {
+            result = removeProps(result, ['used', 'free'], mode == QUERY_MODE.VARIABLE)
         }
 
         return result;
@@ -84,15 +146,16 @@ const SystemService = {
 
     /**
      * Get the current CPU info
+     * from the SystemInformation API
      * 
      * @returns object the information
      */
-    getCPUInfo: async () => {
+    getLiveCPUInfo: async (mode) => {
         const cpu = await si.cpu();
         const temps = await si.cpuTemperature();
         const loads = await si.currentLoad();
 
-        const result = {
+        let result = {
             "vendor": cpu['vendor'],
             "type": cpu['brand'],
             "cores": cpu['cores'],
@@ -104,12 +167,21 @@ const SystemService = {
                 'max': temps['max']
             }
         }
+
+        if(mode != QUERY_MODE.ALL) {
+            result = removeProps(result, ['load', 'temperatures'], mode == QUERY_MODE.VARIABLE)
+        }
+
         return result;
     },
 
 
-
-    getNetworkInfo: async () => {
+    /**
+     * Get the current network information of the system 
+     * from the SystemInformation API
+     * @returns 
+     */
+    getLiveNetworkInfo: async (mode) => {
         const nw = await si.networkInterfaces();
 
         const result = [];
@@ -123,6 +195,10 @@ const SystemService = {
                 delete nic['ieee8021xAuth'];
                 delete nic['ieee8021xState'];
                 delete nic['carrierChanges'];
+
+                if (mode != QUERY_MODE.ALL) {
+                    nic = removeProps(nic, ['ip4', 'ip4subnet', 'ip6', 'ip6subnet', 'speed', 'dhcp'], mode == QUERY_MODE.VARIABLE);
+                }
 
                 result.push(nic);
             }
