@@ -6,6 +6,7 @@ import {
 } from "../utils/ApiError";
 import SystemService from "../services/SystemService";
 import Controller from "./controller";
+import moment from "moment";
 
 class SystemController extends Controller {
 
@@ -36,16 +37,27 @@ class SystemController extends Controller {
             const result = await SystemService.getLiveSystemInfo();
             return super.successResponseData(res, result);
         } catch (e) {
-            return super.errorResponseMsg(res, e.message);
+            return super.errorResponseMsg(res, e);
         }
     };
 
     static async getCurrentCpuInfo(req, res, next) {
         try {
-            const result = await SystemService.getComponentsByType('CPU');
+            let start = undefined;
+            if (req.query.start) {
+                start = moment(req.query.start);
+            }
+
+            let end = undefined;
+            if (req.query.end) {
+                end = moment(req.query.end);
+            }
+
+            const result = await SystemService.getComponentsByType('CPU', req.query.start, req.query.end);
             return super.successResponseData(res, result);
         } catch (e) {
-            return super.errorResponseMsg(res, e.message);
+            console.error(e)
+            return super.errorResponseMsg(res, e);
         }
     };
 

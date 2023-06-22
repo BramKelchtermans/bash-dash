@@ -1,6 +1,7 @@
 import si from 'systeminformation';
 import HardwareComponent from '../models/HardwareComponent';
 import HardwareLog from '../models/HardwareLog';
+import { Op } from 'sequelize';
 
 const _parseCpuLoads = (loads) => {
     const result = {
@@ -55,16 +56,29 @@ const SystemService = {
      * @param {string} type 
      * @returns 
      */
-    getComponentsByType: async (type) => {
+    getComponentsByType: async (type, logStart = undefined, logEnd = undefined) => {
+        const where = { createdAt: {} };
+        console.log(where)
+        if (logStart) {
+            where.createdAt = {
+                [Op.gte]: logStart
+            }
+        }
+        if (logEnd) {
+            where['createdAt'][[Op.lte]] = logStart;
+        }
+
+
         const result = await HardwareComponent.findAll({
             where: {
                 type: type
             },
             include: {
                 model: HardwareLog,
-                where: {
-                    
-                }
+                where: where,
+                order: [
+                    ['id', 'DESC']
+                ]
             }
         })
 
@@ -137,7 +151,7 @@ const SystemService = {
             'free': mem['free']
         }
 
-        if(mode != QUERY_MODE.ALL) {
+        if (mode != QUERY_MODE.ALL) {
             result = removeProps(result, ['used', 'free'], mode == QUERY_MODE.VARIABLE)
         }
 
@@ -168,7 +182,7 @@ const SystemService = {
             }
         }
 
-        if(mode != QUERY_MODE.ALL) {
+        if (mode != QUERY_MODE.ALL) {
             result = removeProps(result, ['load', 'temperatures'], mode == QUERY_MODE.VARIABLE)
         }
 
