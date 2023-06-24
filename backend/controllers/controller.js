@@ -1,14 +1,13 @@
 class Controller {
     static successResponseData(res, data) {
-        return res.status(200).json({
-            status: 200,
-            msg: 'success',
-            data: data
-        });
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        return res.status(200).json(data);
     }
     static errorResponseMsg(res, msg) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         return res.status(500).json({
-            "status": "server_error",
             "msg": msg
         })
     }

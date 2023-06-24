@@ -2,6 +2,7 @@ import si from 'systeminformation';
 import HardwareComponent from '../models/HardwareComponent';
 import HardwareLog from '../models/HardwareLog';
 import { Op } from 'sequelize';
+import moment from 'moment';
 
 const _parseCpuLoads = (loads) => {
     const result = {
@@ -57,16 +58,15 @@ const SystemService = {
      * @returns 
      */
     getComponentsByType: async (type, logStart = undefined, logEnd = undefined) => {
-        const where = { createdAt: {} };
-        console.log(where)
-        if (logStart) {
-            where.createdAt = {
-                [Op.gte]: logStart
+        logStart = logStart ? moment(logStart).toISOString() : moment().subtract('1', 'minute').toISOString();
+        logEnd = logEnd ? moment(logEnd).toISOString() : moment().toISOString();
+
+        const where = {
+            createdAt: {
+                [Op.gte]: logStart,
+                [Op.lte]: logEnd
             }
-        }
-        if (logEnd) {
-            where['createdAt'][[Op.lte]] = logStart;
-        }
+        };
 
 
         const result = await HardwareComponent.findAll({
@@ -168,6 +168,7 @@ const SystemService = {
         const cpu = await si.cpu();
         const temps = await si.cpuTemperature();
         const loads = await si.currentLoad();
+        console.log(cpu)
 
         let result = {
             "vendor": cpu['vendor'],

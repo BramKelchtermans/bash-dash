@@ -43,16 +43,6 @@ class SystemController extends Controller {
 
     static async getCurrentCpuInfo(req, res, next) {
         try {
-            let start = undefined;
-            if (req.query.start) {
-                start = moment(req.query.start);
-            }
-
-            let end = undefined;
-            if (req.query.end) {
-                end = moment(req.query.end);
-            }
-
             const result = await SystemService.getComponentsByType('CPU', req.query.start, req.query.end);
             return super.successResponseData(res, result);
         } catch (e) {

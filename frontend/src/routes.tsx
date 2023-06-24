@@ -17,6 +17,7 @@ import {
   MdPerson,
   MdLock,
 } from "react-icons/md";
+import SystemDashboard from "pages/SystemDashboard";
 
 const routes = [
   {
@@ -24,7 +25,7 @@ const routes = [
     layout: "/admin",
     path: "default",
     icon: <MdHome className="h-6 w-6" />,
-    component: <MainDashboard />,
+    component: <SystemDashboard />,
   },
   {
     name: "NFT Marketplace",

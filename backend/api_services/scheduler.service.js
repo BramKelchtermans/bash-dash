@@ -10,7 +10,7 @@ const SchedulerService = {
             (new QueueExecutor()).executeQueuedJobs();
         }, 10000); // Execute queue every minute
         (new InitializeHardware()).once();
-        (new UpdateSystemInfo()).everyFiveSeconds();
+        (new UpdateSystemInfo()).everySecond();
     }
 }
 

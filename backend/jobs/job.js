@@ -8,6 +8,10 @@ class Job {
         this.fire();
     }
 
+    everySecond() {
+        this.cron('* * * * * *')
+    }
+
     everyFiveSeconds() {
         this.cron('*/5 * * * * *')
     }

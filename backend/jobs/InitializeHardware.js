@@ -61,12 +61,19 @@ const handle = async () => {
     }
 }
 
+const resetDatabase = async () => {
+    const conn = new Sequelize(databaseConfig);
+    await conn.query("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'HardwareLogs';");
+
+    const amountComps = await HardwareComponent.count();
+    await conn.query("UPDATE `sqlite_sequence` SET `seq` = " + amountComps + " WHERE `name` = 'HardwareComponents';");
+}
+
 class InitializeHardware extends Job {
     async fire() {
         try {
             await HardwareLog.destroy({ truncate: true, restartIdentity: true });
-            const conn = new Sequelize(databaseConfig);
-            await conn.query("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = 'HardwareLogs';");
+            await resetDatabase();
             await handle();
         } catch (e) {
             console.log(e)
