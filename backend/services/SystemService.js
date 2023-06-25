@@ -168,7 +168,6 @@ const SystemService = {
         const cpu = await si.cpu();
         const temps = await si.cpuTemperature();
         const loads = await si.currentLoad();
-        console.log(cpu)
 
         let result = {
             "vendor": cpu['vendor'],

@@ -1,0 +1,128 @@
+    const [name, setName] = useState('CPU');
+    const [amountCores, setAmountCores] = useState(0);
+
+
+    const [chartOptions, setChartOptions] = useState<any>(CPUChartOptions);
+
+    const [currentLoad, setCurrentLoad] = useState(0);
+    const [loadDifference, setLoadDifference] = useState(0);
+    const chartRef = useRef<ReactApexChart>();
+
+    const [done, setDone] = useState(false);
+
+    const chartDataRef = useRef<any[]>();
+    const [chartData, setChartData] = useState<any[]>();
+
+    const linesRef = useRef<any[]>([]);
+    const lastFetch = useRef<Date>(new Date());
+
+    const parseLogs = (logs: any[]) => {
+        if (!logs) return {};
+        const data: { [index: string]: any } = {
+            'total': [],
+        }
+
+        for (let i = 0; i < amountCores; i++) {
+            data['core_' + i] = [];
+        }
+
+        let lastCreated = new Date();
+        for (let log of logs) {
+            const load = log.data.load;
+            data['total'].push({
+                x: log.createdAt,
+                y: load.cpu_load
+            });
+            lastCreated = new Date(log.createdAt);
+        }
+        lastFetch.current = lastCreated;
+
+        return data;
+    }
+
+    const initStats = (logs: any[]) => {
+        const data = parseLogs(logs);
+        //Make lines
+
+        const lines = [];
+        for (let key in data) {
+            lines.push({
+                name: key,
+                data: data[key],
+            })
+        }
+
+        linesRef.current = lines;
+
+        ApexCharts.exec('realtime', 'updateSeries', lines);
+    }
+
+
+    const extendStats = async () => {
+        if (!lastFetch.current || !linesRef.current || linesRef.current.length == 0) return;
+
+        console.log("Old lines:", linesRef.current)
+        const logs = parseLogs((await SystemService.getCPUInfo(lastFetch.current.toISOString())).logs)
+
+        if (Object.keys(logs).length == 0) return;
+
+        const lines = [];
+        for (let key in logs) {
+            const data = Array.from(linesRef.current.find(line => line.name === key).data);
+            const newLogs = logs[key];
+            for (let l of newLogs) {
+                if (data.length >= 60) {
+                    data.shift();
+                }
+                data.push({
+                    x: l.x,
+                    y: l.y,
+                })
+            }
+            lines.push({
+                name: key,
+                data: data,
+            })
+        }
+        console.log("New lines:", lines)
+
+
+        let lastCreated = new Date();
+
+        lastFetch.current = lastCreated;
+        linesRef.current = lines;
+
+        ApexCharts.exec('realtime', 'updateSeries', lines);
+    }
+
+    const parseInfo = (info: any) => {
+        setName(info.name);
+        setAmountCores(info.cores);
+
+
+        if (info.logs && info.logs.length > 0) {
+            const _currentLoad = Math.round(info.logs[0].data.load.cpu_load);
+            setLoadDifference(_currentLoad - currentLoad);
+            setCurrentLoad(_currentLoad);
+
+            const logs = info.logs.sort((a: any, b: any) => {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            })
+            initStats(logs)
+        }
+    }
+
+    const init = async () => {
+        const resp = await SystemService.getCPUInfo();
+        parseInfo(resp);
+
+        setDone(true)
+    }
+
+
+    useEffect(() => {
+        init();
+        const interval = setInterval(extendStats, props.updateInterval);
+        console.log(lineChartOptionsTotalSpent)
+        return () => clearInterval(interval);
+    }, [])

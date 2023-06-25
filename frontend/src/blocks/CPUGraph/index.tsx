@@ -17,7 +17,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FaMicrochip } from 'react-icons/fa';
 import { Col, Row } from 'reactstrap';
 import clsx from 'clsx';
+import moment from 'moment';
 import ReactApexChart from 'react-apexcharts';
+import CPUChartOptions from './chartOptions';
 interface Props {
     updateInterval: number;
 }
@@ -88,97 +90,37 @@ const CPUGraph: FC<Props> = (props) => {
         "#FF536A",
         "#3FA5D9"
     ];
-    const [name, setName] = useState('CPU');
+
+    const [name, setName] = useState("");
     const [amountCores, setAmountCores] = useState(0);
-
-    const [chartOptions, setChartOptions] = useState<any>({
-        "legend": {
-            "show": false
-        },
-        animations: {
-            enabled: true,
-            easing: 'linear',
-            dynamicAnimation: {
-                speed: props.updateInterval
-            }
-        },
-        "theme": {
-            "mode": "light"
-        },
-        "chart": {
-            "type": "line",
-            "toolbar": {
-                "show": false
-            }
-        },
-        "dataLabels": {
-            "enabled": false
-        },
-        "stroke": {
-            "curve": "smooth"
-        },
-        "tooltip": {
-            "style": {
-                "fontSize": "12px",
-                "backgroundColor": "#000000"
-            },
-            "theme": "dark",
-            "x": {
-                "format": "dd/MM/yy HH:mm"
-            }
-        },
-        "grid": {
-            "show": false
-        },
-        "xaxis": {
-            "axisBorder": {
-                "show": false
-            },
-            "axisTicks": {
-                "show": false
-            },
-            "labels": {
-                "style": {
-                    "colors": "#A3AED0",
-                    "fontSize": "12px",
-                    "fontWeight": "500"
-                }
-            },
-            "type": "text",
-            "categories": [
-                "-1min",
-                "-55s",
-                "-50s",
-                "-45s",
-                "-40s",
-                "-35s",
-                "-30s",
-                "-25s",
-                "-20s",
-                "-15s",
-                "-10s",
-                "-5s",
-                "0s",
-            ],
-            "convertedCatToNumeric": true
-        },
-        "yaxis": {
-            "show": false
-        }
-    })
-
     const [currentLoad, setCurrentLoad] = useState(0);
-    const [loadDifference, setLoadDifference] = useState(0);
 
-    const [logs, setLogs] = useState<any[]>();
-    const chartRef = useRef<ReactApexChart>();
+    const [chartOptions, setChartOptions] = useState<any>(CPUChartOptions);
 
-    const [done, setDone] = useState(false);
+    const lastFetchRef = useRef<Date | undefined>();
+    const linesRef = useRef<Array<any>>([]);
 
-    const [chartData, setChartData] = useState<any[]>();
-    useMemo(() => {
-        if (!logs) return ;
-        const lines = [];
+    const getCurrentLoad = (logs: any[]) => {
+        const _currentLoad = logs.sort((a: any, b: any) => {
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        })[0].data.load.cpu_load;
+        setCurrentLoad(Math.round(_currentLoad));
+    }
+
+    const init = async () => {
+        lastFetchRef.current = new Date();
+        const info = await SystemService.getCPUInfo();
+        setName(info.name);
+        setAmountCores(info.cores);
+
+        if (info.logs && info.logs.length > 0) {
+            getCurrentLoad(info.logs);
+
+            createFirstLine(info.logs)
+        }
+    }
+
+    const parseLogs = (logs: any[]) => {
         const data: { [index: string]: any } = {
             'total': [],
         }
@@ -187,58 +129,80 @@ const CPUGraph: FC<Props> = (props) => {
             data['core_' + i] = [];
         }
 
+        let lastCreated = new Date();
         for (let log of logs) {
             const load = log.data.load;
-            data['total'].push(load.cpu_load);
+            data['total'].push({
+                x: log.createdAt,
+                y: Math.round(load.cpu_load)
+            });
+            lastCreated = new Date(log.createdAt);
         }
 
-
-        lines.push({
-            'name': 'Total Load',
-            'color': hexColors[0],
-            'data': data['total'],
-        });
-        console.log(lines)
-        if (!done) {
-            setDone(true)
-        }
-
-        setChartData(lines)
-    }, [logs])
-
-    const parseInfo = (info: any) => {
-        setName(info.name);
-        setAmountCores(info.cores);
-
-        if (info.logs.length > 0) {
-            const _currentLoad = Math.round(info.logs[0].data.load.cpu_load);
-            setLoadDifference(_currentLoad - currentLoad);
-            setCurrentLoad(_currentLoad);
-        }
-
-        const logs = info.logs.sort((a: any, b: any) => {
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        })
-        console.log(logs)
-        setLogs(logs);
+        return data;
     }
 
-    const init = async () => {
-        const resp = await SystemService.getCPUInfo();
-        parseInfo(resp);
+    const createFirstLine = (logs: any[]) => {
+        if (!logs) return {};
+        const data = parseLogs(logs);
+
+        const lines = [];
+        for (let key in data) {
+            lines.push({
+                name: key,
+                data: data[key],
+            })
+        }
+
+        linesRef.current = lines;
+        ApexCharts.exec('realtime', 'updateSeries', lines);
+    }
+
+    const updateLine = (name: string, data: any) => {
+        if (name == 'total') {
+            for (let row of data) {
+                // if (linesRef.current.find((line) => line.name == name).data.length >= 60)
+                //     linesRef.current.find((line) => line.name == name).data.shift();
+                linesRef.current.find((line) => line.name == name).data.push({
+                    x: row.x,
+                    y: Math.round(row.y),
+                });
+                // linesRef.current.find((line) => line.name == name).data = linesRef.current.find((line) => line.name == name).data.slice()
+            }
+        }
+
+        ApexCharts.exec('realtime', 'updateSeries', linesRef.current);
+    }
+
+    const update = async () => {
+        const info = await SystemService.getCPUInfo(lastFetchRef.current.toISOString());
+        lastFetchRef.current = new Date();
+
+        if (info.logs && info.logs.length > 0) {
+            getCurrentLoad(info.logs);
+
+            const data = parseLogs(info.logs);
+            for (let key in data) {
+                updateLine(key, data[key]);
+            }
+        }
+
     }
 
 
     useEffect(() => {
         init();
-        const interval = setInterval(init, props.updateInterval);
-        console.log(lineChartOptionsTotalSpent)
-        return () => clearInterval(interval);
-    }, [])
 
+        const interval = setInterval(() => {
+            update();
+        }, props.updateInterval);
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
 
     return (
-        <Card extra="!p-[20px] text-center" style={{ height: '350px' }}>
+        <Card extra="!p-[20px] text-center" style={{ height: '500px' }}>
             <div className="flex justify-between">
                 <button
                     className="graph-icon"
@@ -264,16 +228,14 @@ const CPUGraph: FC<Props> = (props) => {
                     </div>
                 </Col>
                 <Col md="11">
-                    {done &&
-                        <ReactApexChart
-                            ref={chartRef}
-                            options={chartOptions}
-                            series={chartData}
-                            type="line"
-                            width="100%"
-                            height="100%"
-                        />
-                    }
+                    <ReactApexChart
+                        id="cpu-graph"
+                        options={chartOptions}
+                        series={[]}
+                        type="line"
+                        width="100%"
+                        height="100%"
+                    />
                 </Col>
             </Row>
 

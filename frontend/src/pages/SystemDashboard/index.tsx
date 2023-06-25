@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from "react";
 import SystemService from "services/SystemService";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import '../../assets/css/SystemDashboard.css'
+// import CPUGraph from "blocks/CPUGraph";
 const SystemDashboard: FC = (props) => {
     const [cpuInfo, setCPUInfo] = useState();
 

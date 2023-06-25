@@ -14,8 +14,17 @@ const parseHardwareStaticInfo = (info: any) => {
     return data
 }
 const SystemService = {
-    getCPUInfo: async () => {
-        const result: any = await ApiService.get('system/cpu');
+    getCPUInfo: async (start: string | undefined = undefined, end: string | undefined = undefined) => {
+        let url = 'system/cpu';
+        if (start !== undefined) {
+            url += '?start=' + start;
+        }
+
+        if (end !== undefined) {
+            url += '&end=' + end;
+        }
+
+        const result: any = await ApiService.get(url);
         return parseHardwareStaticInfo(result);
     }
 }

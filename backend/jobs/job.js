@@ -9,7 +9,7 @@ class Job {
     }
 
     everySecond() {
-        this.cron('* * * * * *')
+        this.cron('*/1 * * * * *')
     }
 
     everyFiveSeconds() {
