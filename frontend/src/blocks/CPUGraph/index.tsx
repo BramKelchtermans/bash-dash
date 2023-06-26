@@ -1,25 +1,16 @@
 import React, { FC, useState, useContext, useEffect, useMemo, useRef } from 'react';
-import {
-    MdArrowDropUp,
-    MdOutlineCalendarToday,
-    MdBarChart,
-    MdArrowDownward,
-    MdArrowDropDown,
-} from "react-icons/md";
 import Card from "components/card";
-import {
-    lineChartDataTotalSpent,
-    lineChartOptionsTotalSpent,
-} from "variables/charts";
-import LineChart from "components/charts/LineChart";
 import SystemService from 'services/SystemService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FaMicrochip } from 'react-icons/fa';
 import { Col, Row } from 'reactstrap';
-import clsx from 'clsx';
-import moment from 'moment';
+import si from 'systeminformation';
 import ReactApexChart from 'react-apexcharts';
 import CPUChartOptions from './chartOptions';
+import { Line } from 'react-chartjs-2';
+import LineChart from 'components/charts/LineChart';
+import { Chart as ChartJS } from 'chart.js'
+
 interface Props {
     updateInterval: number;
 }
@@ -98,7 +89,8 @@ const CPUGraph: FC<Props> = (props) => {
     const [chartOptions, setChartOptions] = useState<any>(CPUChartOptions);
 
     const lastFetchRef = useRef<Date | undefined>();
-    const linesRef = useRef<Array<any>>([]);
+
+    const [dataSets, setDataSets] = useState<any[]>();
 
     const getCurrentLoad = (logs: any[]) => {
         const _currentLoad = logs.sort((a: any, b: any) => {
@@ -106,6 +98,30 @@ const CPUGraph: FC<Props> = (props) => {
         })[0].data.load.cpu_load;
         setCurrentLoad(Math.round(_currentLoad));
     }
+
+    const initSets = (info: any) => {
+        const logs = info.logs;
+        if (!logs) return {};
+
+        const _dataSets = [];
+
+        _dataSets.push({
+            'name': 'Total Load',
+            'color': 'rgb(180, 0, 250)',
+            'data': [],
+        })
+
+        for (let i = 0; i < info.cores; i++) {
+            _dataSets.push({
+                'name': "Core " + (i + 1),
+                'color': hexColors[i],
+                'data': [],
+            })
+        }
+
+        setDataSets(_dataSets);
+    }
+
 
     const init = async () => {
         lastFetchRef.current = new Date();
@@ -115,131 +131,81 @@ const CPUGraph: FC<Props> = (props) => {
 
         if (info.logs && info.logs.length > 0) {
             getCurrentLoad(info.logs);
-
-            createFirstLine(info.logs)
+            initSets(info)
         }
+
     }
 
-    const parseLogs = (logs: any[]) => {
-        const data: { [index: string]: any } = {
-            'total': [],
-        }
-
-        for (let i = 0; i < amountCores; i++) {
-            data['core_' + i] = [];
-        }
-
-        let lastCreated = new Date();
-        for (let log of logs) {
-            const load = log.data.load;
-            data['total'].push({
-                x: log.createdAt,
-                y: Math.round(load.cpu_load)
-            });
-            lastCreated = new Date(log.createdAt);
-        }
-
-        return data;
-    }
-
-    const createFirstLine = (logs: any[]) => {
-        if (!logs) return {};
-        const data = parseLogs(logs);
-
-        const lines = [];
-        for (let key in data) {
-            lines.push({
-                name: key,
-                data: data[key],
-            })
-        }
-
-        linesRef.current = lines;
-        ApexCharts.exec('realtime', 'updateSeries', lines);
-    }
-
-    const updateLine = (name: string, data: any) => {
-        if (name == 'total') {
-            for (let row of data) {
-                if (linesRef.current.find((line) => line.name == name).data.length >= 60)
-                    linesRef.current.find((line) => line.name == name).data.shift();
-                linesRef.current.find((line) => line.name == name).data.push({
-                    x: row.x,
-                    y: Math.round(row.y),
-                });
-                // linesRef.current.find((line) => line.name == name).data = linesRef.current.find((line) => line.name == name).data.slice()
-            }
-        }
-
-        ApexCharts.exec('realtime', 'updateSeries', linesRef.current);
-    }
-
-    const update = async () => {
-        const info = await SystemService.getCPUInfo(lastFetchRef.current.toISOString());
+    const getPoints = async (chart: ChartJS) => {
+        const logs = (await SystemService.getCPUInfo(lastFetchRef.current.toISOString())).logs;
         lastFetchRef.current = new Date();
-
-        if (info.logs && info.logs.length > 0) {
-            getCurrentLoad(info.logs);
-
-            const data = parseLogs(info.logs);
-            for (let key in data) {
-                updateLine(key, data[key]);
+        if (!logs) return;
+        getCurrentLoad(logs);
+        for (let newLog of logs) {
+            if (chart.data.datasets[0].data.length >= 65) {
+                chart.data.datasets[0].data.shift();
             }
+            chart.data.datasets[0].data.push({
+                x: Date.now(),
+                y: Math.round(newLog.data.load.cpu_load),
+            });
         }
-
+        // chart.data.datasets.forEach(dataset => {
+        //     dataset.data.push({
+        //         x: Date.now(),
+        //         y: Math.random()
+        //     });
+        // });
     }
-
 
     useEffect(() => {
         init();
-
-        const interval = setInterval(() => {
-            update();
-        }, props.updateInterval);
-        return () => {
-            clearInterval(interval);
-        };
     }, []);
 
     return (
-        <Card extra="!p-[20px] text-center" style={{ height: '500px' }}>
-            <div className="flex justify-between">
-                <button
-                    className="graph-icon"
-                    style={{
-                        backgroundColor: 'rgba(108, 187, 60, 0.15)',
-                        color: 'color: rgb(65, 163, 23);'
-                    }}
-                >
-                    <FaMicrochip className="w-5 h-5" />
-                    <span>{name}</span>
-                </button>
-                {/* <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-success p-2 text-brand-500 !transition !duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
+        <>
+            <Card extra="!p-[20px] text-center" style={{height: '200px'}}>
+                <div className="graph-header">
+
+                    <div className="flex justify-between">
+                        <button
+                            className="graph-icon"
+                            // style={{
+                            //     backgroundColor: 'rgba(108, 187, 60, 0.15)',
+                            //     color: ' rgb(65, 163, 23)'
+                            // }}
+                        >
+                            <FaMicrochip className="w-5 h-5" />
+                            <span>{name}</span>
+
+                        </button>
+
+                        {/* <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-success p-2 text-brand-500 !transition !duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
                     <MdBarChart className="h-6 w-6" />
                 </button> */}
-            </div>
-            <Row className="h-full">
-                <Col md="1">
-                    <div className="flex flex-col">
+                    </div>
+                    <div className="text-left">
                         <p className="mt-[20px] text-3xl font-bold text-navy-700 dark:text-white">
                             {currentLoad}%
                         </p>
                         <p className="text-sm text-gray-600">Total load</p>
                     </div>
-                </Col>
-                <Col md="11">
-                    <ReactApexChart
-                        id="cpu-graph"
-                        options={chartOptions}
-                        series={[]}
-                        type="line"
-                        width="100%"
-                        height="100%"
-                    />
-                </Col>
-            </Row>
+                </div>
+                <div
+                    className="graph-chart-container "
+                >
 
-        </Card >
+                    {dataSets &&
+                        <LineChart
+                            interval={1000}
+                            onRefresh={getPoints}
+                            data={dataSets}
+                        />
+                    }
+                </div>
+
+            </Card >
+        </>
     );
 }
 export default CPUGraph;
