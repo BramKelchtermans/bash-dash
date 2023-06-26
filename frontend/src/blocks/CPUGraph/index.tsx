@@ -161,8 +161,8 @@ const CPUGraph: FC<Props> = (props) => {
     const updateLine = (name: string, data: any) => {
         if (name == 'total') {
             for (let row of data) {
-                // if (linesRef.current.find((line) => line.name == name).data.length >= 60)
-                //     linesRef.current.find((line) => line.name == name).data.shift();
+                if (linesRef.current.find((line) => line.name == name).data.length >= 60)
+                    linesRef.current.find((line) => line.name == name).data.shift();
                 linesRef.current.find((line) => line.name == name).data.push({
                     x: row.x,
                     y: Math.round(row.y),

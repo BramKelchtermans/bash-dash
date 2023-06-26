@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently -k \"BROWSER=none npm start --prefix ./frontend\" \"npm:electron\"",
+    "dev": "concurrently -k \"BROWSER=none npm run start:dev --prefix ./frontend\" \"npm:electron\"",
     "electron": "wait-on tcp:3000 && electron ."
   },
   "keywords": [],
