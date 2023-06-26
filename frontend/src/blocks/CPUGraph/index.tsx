@@ -107,7 +107,7 @@ const CPUGraph: FC<Props> = (props) => {
 
         _dataSets.push({
             'name': 'Total Load',
-            'color': 'rgb(180, 0, 250)',
+            'color': 'var(--bs-link-color)',
             'data': [],
         })
 
@@ -142,7 +142,7 @@ const CPUGraph: FC<Props> = (props) => {
         if (!logs) return;
         getCurrentLoad(logs);
         for (let newLog of logs) {
-            if (chart.data.datasets[0].data.length >= 65) {
+            if (chart.data.datasets[0].data.length >= 120) {
                 chart.data.datasets[0].data.shift();
             }
             chart.data.datasets[0].data.push({
@@ -164,8 +164,8 @@ const CPUGraph: FC<Props> = (props) => {
 
     return (
         <>
-            <Card extra="!p-[20px] text-center" style={{height: '200px'}}>
-                <div className="graph-header">
+            <Card extra="!p-[20px] text-center">
+                <div className="graph-header !p-[20px]">
 
                     <div className="flex justify-between">
                         <button
@@ -185,7 +185,7 @@ const CPUGraph: FC<Props> = (props) => {
                 </button> */}
                     </div>
                     <div className="text-left">
-                        <p className="mt-[20px] text-3xl font-bold text-navy-700 dark:text-white">
+                        <p className="text-3xl font-bold text-navy-700 dark:text-white">
                             {currentLoad}%
                         </p>
                         <p className="text-sm text-gray-600">Total load</p>

@@ -17,7 +17,7 @@ interface Props {
         }>
     }>;
     onRefresh: (chart: ChartJS) => void;
-} 
+}
 
 const LineChart: FC<Props> = (props) => {
 
@@ -38,7 +38,7 @@ const LineChart: FC<Props> = (props) => {
             b: parseInt(result[3], 16)
         } : null;
     }
-    const stringToColor = (str: string) => {
+    const stringToColor = (str: string): any => {
         if (str.includes("#")) {
             return hexToRgb(str);
         } else if (str.includes("rgb")) {
@@ -47,6 +47,14 @@ const LineChart: FC<Props> = (props) => {
                 r: parseInt(rgb[0]),
                 g: parseInt(rgb[1]),
                 b: parseInt(rgb[2])
+            }
+        } else {
+            try {
+                str = str.replace("var(--", "").replace(")", "");
+                return stringToColor(getComputedStyle(document.body).getPropertyValue('--' + str));
+            } catch (e) {
+                console.error(e);
+                return {};
             }
         }
     }

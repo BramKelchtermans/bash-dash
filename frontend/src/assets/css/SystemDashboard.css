@@ -14,17 +14,23 @@
 
 .graph-header {
     position: absolute;
+    left: 0px;
+    top: 0px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .graph-chart-container {
     position: absolute;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    width: calc(100% + 6px);
-    height: 150px !important;
+    left: -1%;
+    right: -1%;
+    bottom: -1%;
+    width: calc(102%);
     border-radius: 20px;
+    height: 75%;
 }
+
 .graph-chart-container canvas {
-    border-radius: 25px;
+    border-radius: 32px;
 }

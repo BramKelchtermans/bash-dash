@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from "react";
 import SystemService from "services/SystemService";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import '../../assets/css/SystemDashboard.css'
+import PieChartCard from "views/admin/default/components/PieChartCard";
 
 const SystemDashboard: FC = (props) => {
 	const [cpuInfo, setCPUInfo] = useState();
@@ -15,6 +16,9 @@ const SystemDashboard: FC = (props) => {
 				<CPUGraph
 					updateInterval={intervalTime}
 				/>
+				<WeeklyRevenue />
+				<PieChartCard />
+
 			</div >
 		</>
 	)
