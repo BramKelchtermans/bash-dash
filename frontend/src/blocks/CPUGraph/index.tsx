@@ -94,7 +94,7 @@ const CPUGraph: FC<Props> = (props) => {
 
     const getCurrentLoad = (logs: any[]) => {
         const _currentLoad = logs.sort((a: any, b: any) => {
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         })[0].data.load.cpu_load;
         setCurrentLoad(Math.round(_currentLoad));
     }
@@ -136,33 +136,24 @@ const CPUGraph: FC<Props> = (props) => {
 
     }
 
-    const getPoints = async (chart: ChartJS) => {
+    const getPoint = async () => {
         const logs = (await SystemService.getCPUInfo(lastFetchRef.current.toISOString())).logs;
 
-        if (!logs) return;
+        if (!logs) return {
+            x: 0,
+            y: 0,
+        };
         getCurrentLoad(logs);
 
-        let lastFetch = lastFetchRef.current;
-        // for (let newLog of logs) {
-        const newLog = logs[logs.length - 1];
-        if (chart.data.datasets[0].data.length >= 120) {
-            chart.data.datasets[0].data.shift();
+        const lastLog = logs.sort((a: any, b: any) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        })[0];
+
+        lastFetchRef.current = new Date(lastLog.createdAt);
+        return {
+            x: lastFetchRef.current.getTime(),
+            y: lastLog.data.load.cpu_load,
         }
-        lastFetch = new Date(newLog.createdAt);
-        if (lastFetch > lastFetchRef.current) {
-            chart.data.datasets[0].data.push({
-                x: lastFetch.getTime(),
-                y: Math.round(newLog.data.load.cpu_load),
-            });
-        }
-        // }
-        lastFetchRef.current = lastFetch;
-        // chart.data.datasets.forEach(dataset => {
-        //     dataset.data.push({
-        //         x: Date.now(),
-        //         y: Math.random()
-        //     });
-        // });
     }
 
     useEffect(() => {
@@ -171,47 +162,19 @@ const CPUGraph: FC<Props> = (props) => {
 
     return (
         <>
-            <Card extra="!p-[20px] text-center">
-                <div className="graph-header !p-[20px]">
 
-                    <div className="flex justify-between">
-                        <button
-                            className="graph-icon"
-                        // style={{
-                        //     backgroundColor: 'rgba(108, 187, 60, 0.15)',
-                        //     color: ' rgb(65, 163, 23)'
-                        // }}
-                        >
-                            <FaMicrochip className="w-5 h-5" />
-                            <span>{name}</span>
 
-                        </button>
+            {dataSets &&
+                <LineChart
+                    interval={props.updateInterval}
+                    getPoint={getPoint}
+                    data={dataSets}
+                    icon={(<FaMicrochip className="w-5 h-5" />)}
+                    title={name}
+                    value={currentLoad + '%'}
+                />
+            }
 
-                        {/* <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-success p-2 text-brand-500 !transition !duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
-                    <MdBarChart className="h-6 w-6" />
-                </button> */}
-                    </div>
-                    <div className="text-left">
-                        <p className="text-3xl font-bold text-navy-700 dark:text-white">
-                            {currentLoad}%
-                        </p>
-                        <p className="text-sm text-gray-600">Total load</p>
-                    </div>
-                </div>
-                <div
-                    className="graph-chart-container "
-                >
-
-                    {dataSets &&
-                        <LineChart
-                            interval={props.updateInterval}
-                            onRefresh={getPoints}
-                            data={dataSets}
-                        />
-                    }
-                </div>
-
-            </Card >
         </>
     );
 }

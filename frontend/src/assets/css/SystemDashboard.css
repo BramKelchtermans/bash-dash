@@ -23,14 +23,14 @@
 
 .graph-chart-container {
     position: absolute;
-    left: -1%;
-    right: -1%;
-    bottom: -1%;
-    width: calc(102%);
+    left: -0.16rem;
+    right: -0.16rem;
+    bottom: -0.18rem;
+    width: calc(100% + 0.32rem);
     border-radius: 20px;
     height: 75%;
 }
 
 .graph-chart-container canvas {
-    border-radius: 32px;
+    border-radius: 30px;
 }
