@@ -8,7 +8,7 @@ import PieChartCard from "views/admin/default/components/PieChartCard";
 const SystemDashboard: FC = (props) => {
 	const [cpuInfo, setCPUInfo] = useState();
 
-	const intervalTime = 1000;
+	const intervalTime = 2000;
 
 	return (
 		<>

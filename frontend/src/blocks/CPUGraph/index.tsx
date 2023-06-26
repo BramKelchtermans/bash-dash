@@ -138,18 +138,25 @@ const CPUGraph: FC<Props> = (props) => {
 
     const getPoints = async (chart: ChartJS) => {
         const logs = (await SystemService.getCPUInfo(lastFetchRef.current.toISOString())).logs;
-        lastFetchRef.current = new Date();
+
         if (!logs) return;
         getCurrentLoad(logs);
-        for (let newLog of logs) {
-            if (chart.data.datasets[0].data.length >= 120) {
-                chart.data.datasets[0].data.shift();
-            }
+
+        let lastFetch = lastFetchRef.current;
+        // for (let newLog of logs) {
+        const newLog = logs[logs.length - 1];
+        if (chart.data.datasets[0].data.length >= 120) {
+            chart.data.datasets[0].data.shift();
+        }
+        lastFetch = new Date(newLog.createdAt);
+        if (lastFetch > lastFetchRef.current) {
             chart.data.datasets[0].data.push({
-                x: Date.now(),
+                x: lastFetch.getTime(),
                 y: Math.round(newLog.data.load.cpu_load),
             });
         }
+        // }
+        lastFetchRef.current = lastFetch;
         // chart.data.datasets.forEach(dataset => {
         //     dataset.data.push({
         //         x: Date.now(),
@@ -170,10 +177,10 @@ const CPUGraph: FC<Props> = (props) => {
                     <div className="flex justify-between">
                         <button
                             className="graph-icon"
-                            // style={{
-                            //     backgroundColor: 'rgba(108, 187, 60, 0.15)',
-                            //     color: ' rgb(65, 163, 23)'
-                            // }}
+                        // style={{
+                        //     backgroundColor: 'rgba(108, 187, 60, 0.15)',
+                        //     color: ' rgb(65, 163, 23)'
+                        // }}
                         >
                             <FaMicrochip className="w-5 h-5" />
                             <span>{name}</span>
@@ -197,7 +204,7 @@ const CPUGraph: FC<Props> = (props) => {
 
                     {dataSets &&
                         <LineChart
-                            interval={1000}
+                            interval={props.updateInterval}
                             onRefresh={getPoints}
                             data={dataSets}
                         />

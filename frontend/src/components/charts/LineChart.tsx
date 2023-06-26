@@ -102,12 +102,14 @@ const LineChart: FC<Props> = (props) => {
                                 realtime: {
                                     duration: 60000,
                                     delay: props.interval * 2,
-                                    onRefresh: props.onRefresh
+                                    onRefresh: props.onRefresh,
+                                    refresh: props.interval
                                 }
                             },
                             y: {
                                 display: false,
                                 max: 100,
+                                min: 0
                             }
                         }
                     }}
