@@ -13,22 +13,20 @@
 }
 
 .graph-header {
-    position: absolute;
-    left: 0px;
-    top: 0px;
     display: flex;
     width: 100%;
     justify-content: space-between;
 }
 
 .graph-chart-container {
+    height: 70%;
+    bottom: 0px;
     position: absolute;
-    left: -0.16rem;
-    right: -0.16rem;
-    bottom: -0.18rem;
-    width: calc(100% + 0.32rem);
-    border-radius: 20px;
-    height: 75%;
+    left: -9px;
+    width: calc(100% + 18px);
+}
+.graph-chart-container div div {
+    border-radius: 50px;
 }
 
 .graph-chart-container canvas {

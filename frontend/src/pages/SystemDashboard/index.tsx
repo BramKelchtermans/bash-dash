@@ -4,22 +4,44 @@ import SystemService from "services/SystemService";
 import WeeklyRevenue from "views/admin/default/components/WeeklyRevenue";
 import '../../assets/css/SystemDashboard.css'
 import PieChartCard from "views/admin/default/components/PieChartCard";
+import LineChart from "components/charts/LineChart";
+import HardwareComponent from "models/HardwareComponents/HardwareComponent";
+import ApexLineChart from "components/charts/ApexLineChart";
 
 const SystemDashboard: FC = (props) => {
-	const [cpuInfo, setCPUInfo] = useState();
+	const [components, setComponents] = useState<any[]>();
 
 	const intervalTime = 2000;
 
+	const initComponents = async () => {
+		const _comps = await SystemService.getSystemHardware();
+		setComponents(_comps);
+		console.log(_comps);
+	}
+
+	useEffect(() => {
+		initComponents();
+	}, []);
+
+
 	return (
 		<>
-			<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-				<CPUGraph
-					updateInterval={intervalTime}
-				/>
-				<WeeklyRevenue />
-				<PieChartCard />
+			{components && (
+				<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+					{/* <LineChart
+						interval={intervalTime}
+						component={components.find(a => a.$type == 'CPU')}
+						icon={components.find(a => a.$type == 'CPU').icon()}
+					/> */}
+					<ApexLineChart
+						interval={intervalTime}
+						component={components.find(a => a.$type == 'CPU')}
+					/>
+					<WeeklyRevenue />
+					<PieChartCard />
 
-			</div >
+				</div >
+			)}
 		</>
 	)
 }

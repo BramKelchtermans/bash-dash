@@ -51,34 +51,54 @@ export const QUERY_MODE = {
 }
 
 const SystemService = {
-    /**
-     * Query a component in the database by type, includes hardware logs
-     * 
-     * @param {string} type 
-     * @returns 
-     */
-    getComponentsByType: async (type, logStart = undefined, logEnd = undefined) => {
+    getComponentLogs: async (id, logStart = undefined, logEnd = undefined) => {
         logStart = logStart ? moment(logStart).toISOString() : moment().subtract('1', 'minute').toISOString();
         logEnd = logEnd ? moment(logEnd).toISOString() : moment().toISOString();
 
         const where = {
+            component_id: id,
             createdAt: {
                 [Op.gte]: logStart,
                 [Op.lte]: logEnd
             }
         };
 
+        const result = await HardwareLog.findAll({
+            where: where
+        });
 
+        return result;
+
+    },
+    /**
+    * Query a component in the database by type, includes hardware logs
+    * 
+    * @param {string} type 
+    * @returns 
+    */
+    getComponentsById: async (id) => {
+        const result = await HardwareComponent.findAll({
+            where: {
+                id: id
+            }
+        })
+
+        if (result.length == 1) {
+            return result[0];
+        }
+
+        return result;
+    },
+    /**
+     * Query a component in the database by type, includes hardware logs
+     * 
+     * @param {string} type 
+     * @returns 
+     */
+    getComponentsByType: async (type) => {
         const result = await HardwareComponent.findAll({
             where: {
                 type: type
-            },
-            include: {
-                model: HardwareLog,
-                where: where,
-                order: [
-                    ['id', 'DESC']
-                ]
             }
         })
 

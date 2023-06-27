@@ -29,12 +29,36 @@ class SystemController extends Controller {
 
     }
 
+    static async getDeviceLogs(req, res, next) {
+        try {
+            const result = await SystemService.getComponentLogs(req.params.componentId, req.query.start, req.query.end);
+            super.successResponseData(res, result);
+        } catch (e) {
+            super.errorResponseMsg(res, e);
+        }
+    }
+
+    static async getDeviceInfo(req, res, next) {
+        try {
+            const result = await SystemService.getComponentsById(req.params.componentId);
+            return super.successResponseData(res, result);
+        } catch (e) {
+            console.log(e)
+            return super.errorResponseMsg(res, e);
+        }
+    }
+
 
 
 
     static async getCurrentSystemInfo(req, res, next) {
         try {
-            const result = await SystemService.getLiveSystemInfo();
+            const result = {
+                'CPU': await SystemService.getComponentsByType('CPU'),
+                'MEMORY': await SystemService.getComponentsByType('MEMORY'),
+                'DISKS': await SystemService.getComponentsByType('DISK'),
+                'NIC': await SystemService.getComponentsByType('NIC'),
+            }
             return super.successResponseData(res, result);
         } catch (e) {
             return super.errorResponseMsg(res, e);
@@ -53,7 +77,7 @@ class SystemController extends Controller {
 
     static async getCurrentMemoryInfo(req, res, next) {
         try {
-            const result = await SystemService.getComponentsByType('MEMORY');
+            const result = await SystemService.getComponentsByType('MEMORY', req.query.start, req.query.end);
             return super.successResponseData(res, result);
         } catch (e) {
             super.errorResponseMsg(res, e.message);

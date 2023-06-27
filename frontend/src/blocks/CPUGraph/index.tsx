@@ -97,16 +97,16 @@ const CPUGraph: FC<Props> = (props) => {
 		<>
 
 
-			{dataSets &&
+			{/* {dataSets &&
 				<LineChart
 					interval={props.updateInterval}
 					getPoint={getPoint}
 					data={dataSets}
 					icon={(<FaMicrochip className="w-5 h-5" />)}
-					title={name}
+					// title={name}
 					value={currentLoad + '%'}
 				/>
-			}
+			} */}
 
 		</>
 	);

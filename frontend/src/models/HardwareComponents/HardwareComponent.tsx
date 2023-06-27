@@ -1,8 +1,8 @@
 class HardwareComponent {
-	private id: number | undefined;
-	private name: string | undefined;
-	private type: string | undefined;
-	private static_attributes: any[] | undefined;
+	protected id: number | undefined;
+	protected name: string | undefined;
+	protected type: string | undefined;
+	protected static_attributes: any | undefined;
 
 	constructor(
 		id: number | undefined = undefined,
@@ -21,6 +21,21 @@ class HardwareComponent {
 		Object.assign(result, json);
 		return result;
 	}
+	public icon(): JSX.Element {
+		throw new Error("not implemented");
+	}
+
+	public async line(): Promise<any[]> {
+		throw new Error("Not implemented");
+	}
+
+	public async nextLinePoint(): Promise<{ x: number, y: number }> {
+		throw new Error("Not implemented");
+	}
+
+	public unit(): string {
+		throw new Error("Not implemented");
+	}
 
 	public get $name(): string | undefined { return this.name; }
 	public set $name(value: string | undefined) { this.name = value; }
@@ -31,3 +46,5 @@ class HardwareComponent {
 	public get $static_attributes(): any[] | undefined { return this.static_attributes; }
 	public set $static_attributes(value: any[] | undefined) { this.static_attributes = value; }
 }
+
+export default HardwareComponent;
