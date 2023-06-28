@@ -57,23 +57,16 @@ const ApexLineChart: FC<Props> = (props) => {
 			<Card extra="text-center" style={{ minHeight: '300px' }}>
 				<div className="!p-[20px]">
 
-					<div className="graph-header px-6">
+					<div className="graph-header">
 
 						<div className="flex justify-between">
 							<button
 								className="graph-icon"
-							// style={{
-							//     backgroundColor: 'rgba(108, 187, 60, 0.15)',
-							//     color: ' rgb(65, 163, 23)'
-							// }}
 							>
 								{props.component.icon()}
 								<span>{props.component.$name}</span>
 
 							</button>
-							{/* <button className="!linear z-[1] flex items-center justify-center rounded-lg bg-success p-2 text-brand-500 !transition !duration-200 hover:bg-gray-100 active:bg-gray-200 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10">
-                    <MdBarChart className="h-6 w-6" />
-                </button> */}
 						</div>
 						<div className="text-left">
 							<p className="text-3xl m-0 font-bold text-navy-700 dark:text-white">
@@ -89,7 +82,7 @@ const ApexLineChart: FC<Props> = (props) => {
 						<ReactApexChart
 							height={'100%'}
 							width={'100%'}
-							options={options}
+							options={LineOptions(props.component.id, XAXISRANGE, props.component.unit())}
 							series={series}
 							type="area"
 						/>
