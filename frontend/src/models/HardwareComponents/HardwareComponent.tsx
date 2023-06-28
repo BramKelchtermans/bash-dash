@@ -16,7 +16,8 @@ abstract class HardwareComponent {
 		this.static_attributes = static_attributes;
 	}
 
-
+	public get $id(): number | undefined { return this.id; }
+	public set $id(value: number | undefined) { this.id = value; }
 
 	public get $name(): string | undefined { return this.name; }
 	public set $name(value: string | undefined) { this.name = value; }

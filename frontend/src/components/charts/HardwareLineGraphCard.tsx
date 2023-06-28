@@ -2,9 +2,10 @@ import Card from "components/card";
 import { FC, useEffect, useMemo, useState } from "react"
 import ReactApexChart from "react-apexcharts";
 import LineOptions from "./ChartOptions/LineOptions";
+import HardwareComponent from "models/HardwareComponents/HardwareComponent";
 
 interface Props {
-	component: any;
+	component: HardwareComponent;
 	interval: number;
 }
 const HardwareLineGraphCard: FC<Props> = (props) => {
@@ -17,7 +18,7 @@ const HardwareLineGraphCard: FC<Props> = (props) => {
 	const [value, setValue] = useState(0)
 	const [series, setSeries] = useState<any[]>()
 
-	const [options, setOptions] = useState<any>(props.component ? LineOptions(props.component.id, XAXISRANGE, props.component.unit()) : {});
+	const [options, setOptions] = useState<any>(props.component ? LineOptions(props.component.$id, XAXISRANGE, props.component.unit()) : {});
 
 	async function getNewSeries(baseval: number) {
 		var newDate = baseval + TICKINTERVAL;
@@ -41,15 +42,14 @@ const HardwareLineGraphCard: FC<Props> = (props) => {
 		const line = await props.component.line();
 		data = line;
 		setSeries([{ data: line }])
-		ApexCharts.exec('line-chart-' + props.component.id, 'updateSeries', [{ title: 'Total Load', data: data }])
+		ApexCharts.exec('line-chart-' + props.component.$id, 'updateSeries', [{ title: 'Total Load', data: data }])
 	}
 	useEffect(() => {
-		console.log(props.component)
 		init();
 		const interval = setInterval(() => {
 			getNewSeries(lastDate)
 
-			ApexCharts.exec('line-chart-' + props.component.id, 'updateSeries', [{ title: 'Total Load', data: data }])
+			ApexCharts.exec('line-chart-' + props.component.$id, 'updateSeries', [{ title: 'Total Load', data: data }])
 		}, 1000);
 		return () => clearInterval(interval);
 	}, []);

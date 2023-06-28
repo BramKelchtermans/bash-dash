@@ -1,18 +1,10 @@
 import ColorUtils from "utils/ColorUtils"
 
-const PieOptions = () => {
+const PieOptions = (labels, colors) => {
 
     return {
-        "labels": [
-            "Your files",
-            "System",
-            "Empty"
-        ],
-        "colors": [
-            "#4318FF",
-            "#6AD2FF",
-            "#EFF4FB"
-        ],
+        "labels": labels,
+        "colors": colors,
         "chart": {
             "width": "50px"
         },
@@ -27,29 +19,26 @@ const PieOptions = () => {
             "show": false
         },
         "dataLabels": {
-            "enabled": false
+            "enabled": false,
+            'textAnchor': 'start'
         },
         "hover": {
             "mode": null
         },
         "plotOptions": {
-            "donut": {
-                "expandOnClick": false,
-                "donut": {
-                    "labels": {
-                        "show": false
+            "pie": {
+                "states": {
+                    "hover": {
+                        brightness: 0,
+                        halo: {
+                            opacity: 1
+                        }
                     }
                 }
             }
         },
         "fill": {
-            "colors": [
-                "#4318FF",
-                "#6AD2FF",
-                "#EFF4FB",
-                "#33a1ff",
-                "#003b8c",
-            ]
+            "colors": colors
         },
         "tooltip": {
             "enabled": true,

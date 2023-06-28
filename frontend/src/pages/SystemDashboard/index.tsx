@@ -10,13 +10,12 @@ import HardwareLineGraphCard from "components/charts/HardwareLineGraphCard";
 import HardwarePieChartCard from "components/charts/HardwarePieChartCard";
 
 const SystemDashboard: FC = (props) => {
-	const [components, setComponents] = useState<any[]>();
+	const [components, setComponents] = useState<HardwareComponent[]>();
 
 	const intervalTime = 2000;
 
 	const initComponents = async () => {
 		const _comps = await SystemService.getSystemHardware();
-		console.log(_comps);
 		setComponents(_comps);
 	}
 
@@ -48,10 +47,13 @@ const SystemDashboard: FC = (props) => {
 
 					</div >
 					<div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-						<HardwarePieChartCard 
-							interval={5000}
-							component={components.find(a => a.$type == 'DISK')}
-						/>
+						{components.filter(a => a.$type == 'DISK').map((disk: HardwareComponent) => (
+
+							<HardwarePieChartCard
+								interval={5000}
+								component={disk}
+							/>
+						))}
 					</div>
 				</>
 			)}
