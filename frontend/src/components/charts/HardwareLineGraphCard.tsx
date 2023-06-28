@@ -7,7 +7,7 @@ interface Props {
 	component: any;
 	interval: number;
 }
-const ApexLineChart: FC<Props> = (props) => {
+const HardwareLineGraphCard: FC<Props> = (props) => {
 	var lastDate = new Date().getTime();
 	var data: any[] = [];
 	// var _series: any[] = props.component.line();
@@ -17,7 +17,7 @@ const ApexLineChart: FC<Props> = (props) => {
 	const [value, setValue] = useState(0)
 	const [series, setSeries] = useState<any[]>()
 
-	const [options, setOptions] = useState<any>(LineOptions(props.component.id, XAXISRANGE, props.component.unit()));
+	const [options, setOptions] = useState<any>(props.component ? LineOptions(props.component.id, XAXISRANGE, props.component.unit()) : {});
 
 	async function getNewSeries(baseval: number) {
 		var newDate = baseval + TICKINTERVAL;
@@ -44,6 +44,7 @@ const ApexLineChart: FC<Props> = (props) => {
 		ApexCharts.exec('line-chart-' + props.component.id, 'updateSeries', [{ title: 'Total Load', data: data }])
 	}
 	useEffect(() => {
+		console.log(props.component)
 		init();
 		const interval = setInterval(() => {
 			getNewSeries(lastDate)
@@ -54,7 +55,7 @@ const ApexLineChart: FC<Props> = (props) => {
 	}, []);
 	return (
 		<>
-			<Card extra="text-center" style={{ minHeight: '300px' }}>
+			<Card extra="text-center line-graph-card" >
 				<div className="!p-[20px]">
 
 					<div className="graph-header">
@@ -82,7 +83,7 @@ const ApexLineChart: FC<Props> = (props) => {
 						<ReactApexChart
 							height={'100%'}
 							width={'100%'}
-							options={LineOptions(props.component.id, XAXISRANGE, props.component.unit())}
+							options={options}
 							series={series}
 							type="area"
 						/>
@@ -93,4 +94,4 @@ const ApexLineChart: FC<Props> = (props) => {
 		</>
 	)
 }
-export default ApexLineChart
+export default HardwareLineGraphCard

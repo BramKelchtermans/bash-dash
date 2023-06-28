@@ -6,7 +6,8 @@ import '../../assets/css/SystemDashboard.css'
 import PieChartCard from "views/admin/default/components/PieChartCard";
 import LineChart from "components/charts/LineChart";
 import HardwareComponent from "models/HardwareComponents/HardwareComponent";
-import ApexLineChart from "components/charts/ApexLineChart";
+import HardwareLineGraphCard from "components/charts/HardwareLineGraphCard";
+import HardwarePieChartCard from "components/charts/HardwarePieChartCard";
 
 const SystemDashboard: FC = (props) => {
 	const [components, setComponents] = useState<any[]>();
@@ -15,6 +16,7 @@ const SystemDashboard: FC = (props) => {
 
 	const initComponents = async () => {
 		const _comps = await SystemService.getSystemHardware();
+		console.log(_comps);
 		setComponents(_comps);
 	}
 
@@ -26,24 +28,32 @@ const SystemDashboard: FC = (props) => {
 	return (
 		<>
 			{components && (
-				<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-2">
-					{/* <LineChart
+				<>
+					<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-2">
+						{/* <LineChart
 						interval={intervalTime}
 						component={components.find(a => a.$type == 'CPU')}
 						icon={components.find(a => a.$type == 'CPU').icon()}
 					/> */}
-					<ApexLineChart
-						interval={intervalTime}
-						component={components.find(a => a.$type == 'CPU')}
-					/>
-					<ApexLineChart
-						interval={intervalTime}
-						component={components.find(a => a.$type == 'MEMORY')}
-					/>
-					<WeeklyRevenue />
-					<PieChartCard />
+						<HardwareLineGraphCard
+							interval={intervalTime}
+							component={components.find(a => a.$type == 'CPU')}
+						/>
+						<HardwareLineGraphCard
+							interval={intervalTime}
+							component={components.find(a => a.$type == 'MEMORY')}
+						/>
+						{/* <WeeklyRevenue />
+						<PieChartCard /> */}
 
-				</div >
+					</div >
+					<div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+						<HardwarePieChartCard 
+							interval={5000}
+							component={components.find(a => a.$type == 'DISK')}
+						/>
+					</div>
+				</>
 			)}
 		</>
 	)

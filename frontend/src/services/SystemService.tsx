@@ -1,7 +1,15 @@
 import HardwareComponent from "models/HardwareComponents/HardwareComponent";
 import ApiService from "./ApiService"
-import CPU from "models/HardwareComponents/CPU";
+import CPU from "models/HardwareComponents/Cpu";
 import Memory from "models/HardwareComponents/Memory";
+import Disk from "models/HardwareComponents/Disk";
+
+const types: { [key: string]: any } = {
+	'CPU': CPU,
+	'MEMORY': Memory,
+	'DISK': Disk
+}
+
 const parseHardwareStaticInfo = (info: any) => {
 	const data: any = {}
 	for (let key in info) {
@@ -22,12 +30,9 @@ function cast<T>(obj: any, cl: { new(...args: []): T }): T {
 	return obj;
 }
 const parseComponent = (json: any) => {
-	let result = HardwareComponent.fromJSON(json);
-	if (json.type == 'CPU')
-		return cast(result, CPU);
-	else if (json.type == 'MEMORY')
-		return cast(result, Memory);
-	return result;
+	const type: string = json.type;
+	if (!type || !Object.keys(types).includes(type)) return;
+	return new types[type](json.id, json.name, json.type, json.static_attributes);
 }
 
 const SystemService = {
@@ -37,11 +42,15 @@ const SystemService = {
 		for (let key in resp) {
 			const value = resp[key];
 			if (Array.isArray(value)) {
-				for (let comp of value) {
-					result.push(parseComponent(comp));
+				for (let raw of value) {
+					const comp = parseComponent(raw);
+					if (comp)
+						result.push(comp);
 				}
 			} else {
-				result.push(parseComponent(value));
+				const comp = parseComponent(value);
+				if (comp)
+						result.push(comp);
 			}
 		}
 		return result;

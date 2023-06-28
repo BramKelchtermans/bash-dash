@@ -1,5 +1,6 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
+import PieOptions from "./ChartOptions/PieOptions";
 
 type ChartProps = {
   // using `interface` is also ok
@@ -22,9 +23,11 @@ class PieChart extends React.Component<ChartProps, ChartState> {
 
   componentDidMount() {
     this.setState({
-      chartData: this.props.chartData,
-      chartOptions: this.props.chartOptions,
+      chartData: [20, 20, 20, 20, 20],
+      chartOptions: PieOptions(),
     });
+    console.log(PieOptions());
+    console.log(this.props.chartData);
   }
 
   render() {

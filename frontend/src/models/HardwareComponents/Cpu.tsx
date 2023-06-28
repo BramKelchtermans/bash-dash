@@ -3,7 +3,7 @@ import HardwareComponent from "./HardwareComponent";
 import SystemService from "services/SystemService";
 import ColorUtils from "utils/ColorUtils";
 
-export default class CPU extends HardwareComponent {
+class CPU extends HardwareComponent {
     private cores: number | undefined;
 
     constructor(
@@ -61,3 +61,4 @@ export default class CPU extends HardwareComponent {
     public get $cores(): number | undefined { return this.cores; }
     public set $cores(value: number | undefined) { this.cores = value; }
 }
+export default CPU;

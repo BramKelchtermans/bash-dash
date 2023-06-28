@@ -32,3 +32,6 @@
 .graph-chart-container canvas {
     border-radius: 30px;
 }
+.line-graph-card {
+    min-height: 300px;
+}

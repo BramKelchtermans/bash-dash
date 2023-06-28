@@ -109,6 +109,34 @@ const ColorUtils = {
 		if (index == undefined)
 			index = Math.round(Math.random() * length);
 		return hexColors[index];
+	},
+
+	generateColorVariations: (baseColor: any, amount: number) => {
+		var variations = [];
+
+		// Extract RGB values from the base color
+		var baseRed = parseInt(baseColor.r, 10);
+		var baseGreen = parseInt(baseColor.g, 10);
+		var baseBlue = parseInt(baseColor.b, 10);
+
+		// Generate color variations
+		for (var i = 1; i <= amount; i++) {
+			var red = Math.floor(Math.random() * 256);
+			var green = Math.floor(Math.random() * 256);
+			var blue = Math.floor(Math.random() * 256);
+
+			// Mix the random RGB values with the base color
+			var mixedRed = Math.floor((red + baseRed) / 2);
+			var mixedGreen = Math.floor((green + baseGreen) / 2);
+			var mixedBlue = Math.floor((blue + baseBlue) / 2);
+
+			// Create the variation color string
+			var variationColor = 'rgb(' + mixedRed + ', ' + mixedGreen + ', ' + mixedBlue + ')';
+
+			variations.push(variationColor);
+		}
+
+		return variations;
 	}
 
 }

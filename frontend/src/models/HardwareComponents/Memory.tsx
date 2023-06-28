@@ -1,11 +1,8 @@
 import { FaMemory } from "react-icons/fa";
 import SystemService from "services/SystemService";
+import HardwareComponent from "./HardwareComponent";
 
-class Memory {
-	protected id: number | undefined;
-	protected name: string | undefined;
-	protected type: string | undefined;
-	protected static_attributes: any | undefined;
+class Memory extends HardwareComponent {
 	protected total: any | undefined;
 
 	constructor(
@@ -14,10 +11,7 @@ class Memory {
 		type: string | undefined = undefined,
 		static_attributes: any[] | undefined = undefined
 	) {
-		this.id = id;
-		this.name = name;
-		this.type = type;
-		this.static_attributes = static_attributes;
+		super(id, name, type, static_attributes);
 	}
 
 	public icon(): JSX.Element {
@@ -56,19 +50,15 @@ class Memory {
 		return '%';
 	}
 
-	public get $name(): string | undefined { return this.name; }
-	public set $name(value: string | undefined) { this.name = value; }
-
-	public get $type(): string | undefined { return this.type; }
-	public set $type(value: string | undefined) { this.type = value; }
-
-	public get $static_attributes(): any[] | undefined { return this.static_attributes; }
-	public set $static_attributes(value: any[] | undefined) { this.static_attributes = value; }
-
 	public get $total(): number | undefined { return this.static_attributes.total; }
 
 	private static bytesToGigabytes(bytes: number) {
 		return bytes / 1024 / 1024 / 1024;
+	}
+
+	// Get pie data
+	public async pieData(): Promise<any[]> {
+		throw new Error("Not implemented");
 	}
 }
 
