@@ -16,7 +16,6 @@ const SystemDashboard: FC = (props) => {
 	const initComponents = async () => {
 		const _comps = await SystemService.getSystemHardware();
 		setComponents(_comps);
-		console.log(_comps);
 	}
 
 	useEffect(() => {
@@ -27,7 +26,7 @@ const SystemDashboard: FC = (props) => {
 	return (
 		<>
 			{components && (
-				<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+				<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-2">
 					{/* <LineChart
 						interval={intervalTime}
 						component={components.find(a => a.$type == 'CPU')}
@@ -36,6 +35,10 @@ const SystemDashboard: FC = (props) => {
 					<ApexLineChart
 						interval={intervalTime}
 						component={components.find(a => a.$type == 'CPU')}
+					/>
+					<ApexLineChart
+						interval={intervalTime}
+						component={components.find(a => a.$type == 'MEMORY')}
 					/>
 					<WeeklyRevenue />
 					<PieChartCard />
