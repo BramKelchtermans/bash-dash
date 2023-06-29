@@ -41,15 +41,22 @@ const HardwarePieChartCard: FC<Props> = (props) => {
                     <p className="ml-1 text-sm font-normal text-gray-600 m-0">{props.data.label} ({Math.round(props.data.pct)}%)</p>
                 </div>
                 <p className="mt-px text-xl font-bold text-navy-700  dark:text-white ">
-                     {Math.round(props.data.value)} {props.unit}
+                    {Math.round(props.data.value)} {props.unit}
                 </p>
-                     
+
             </div>
         )
     }
 
     useEffect(() => {
         init();
+
+        const interval = setInterval(() => {
+            init();
+        }, props.interval)
+        return () => {
+            clearInterval(interval);
+        }
     }, [])
     return (
         <Card extra="rounded-[20px] p-3">
@@ -74,7 +81,7 @@ const HardwarePieChartCard: FC<Props> = (props) => {
                 {pieData && pieData.map((data: any, index: number) => {
                     return (
                         <Col sm="12" md="6">
-                            <DetailBlock key={index} data={data} unit={props.component.unit()}/>
+                            <DetailBlock key={index} data={data} unit={props.component.unit()} />
                         </Col>
                     )
                 })}
