@@ -3,6 +3,7 @@ import HardwareComponent from '../models/HardwareComponent';
 import HardwareLog from '../models/HardwareLog';
 import { Op } from 'sequelize';
 import moment from 'moment';
+import speedtest from 'speedtest-net'
 
 const _parseCpuLoads = (loads) => {
     const result = {
@@ -220,7 +221,7 @@ const SystemService = {
 
         const result = [];
         for (let nic of nw) {
-            if (nic['speed']) {
+            if (nic['default']) {
                 delete nic['duplex'];
                 delete nic['operstate'];
                 delete nic['virtual'];
