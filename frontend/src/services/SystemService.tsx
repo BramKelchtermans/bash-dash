@@ -3,11 +3,13 @@ import ApiService from "./ApiService"
 import CPU from "models/HardwareComponents/Cpu";
 import Memory from "models/HardwareComponents/Memory";
 import Disk from "models/HardwareComponents/Disk";
+import Nic from "models/HardwareComponents/Nic";
 
 const types: { [key: string]: any } = {
 	'CPU': CPU,
 	'MEMORY': Memory,
-	'DISK': Disk
+	'DISK': Disk,
+	'NIC': Nic
 }
 
 const parseHardwareStaticInfo = (info: any) => {

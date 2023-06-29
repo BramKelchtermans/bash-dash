@@ -16,6 +16,7 @@ const SystemDashboard: FC = (props) => {
 
 	const initComponents = async () => {
 		const _comps = await SystemService.getSystemHardware();
+		console.log(_comps);
 		setComponents(_comps);
 	}
 
@@ -28,7 +29,7 @@ const SystemDashboard: FC = (props) => {
 		<>
 			{components && (
 				<>
-					<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-2">
+					<div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
 						{/* <LineChart
 						interval={intervalTime}
 						component={components.find(a => a.$type == 'CPU')}
@@ -42,11 +43,15 @@ const SystemDashboard: FC = (props) => {
 							interval={intervalTime}
 							component={components.find(a => a.$type == 'MEMORY')}
 						/>
+						{/* <HardwareLineGraphCard
+							interval={intervalTime}
+							component={components.find(a => a.$type == 'NIC')}
+						/> */}
 						{/* <WeeklyRevenue />
 						<PieChartCard /> */}
 
 					</div >
-					<div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+					<div className="mt-5 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-3">
 						{components.filter(a => a.$type == 'DISK').map((disk: HardwareComponent) => (
 
 							<HardwarePieChartCard
